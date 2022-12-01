@@ -15,6 +15,9 @@ public class Main extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			VBox root = loader.load(new FileInputStream("src/application/BankingView.fxml"));
+			BankingController controller = (BankingController)loader.getController();
+			controller.applicationStage = primaryStage;
+			
 			Scene scene = new Scene(root,400,400);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);

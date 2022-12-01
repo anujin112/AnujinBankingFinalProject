@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.VBox?>
 
-
-<VBox prefHeight="202.0" prefWidth="294.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+<VBox prefHeight="202.0" prefWidth="294.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.BankingController">
    <children>
       <Label text="What are your current available funds?">
          <VBox.margin>
@@ -22,10 +21,10 @@
                   <Insets left="80.0" right="10.0" />
                </HBox.margin>
             </Label>
-            <TextField prefHeight="25.0" prefWidth="98.0" />
+            <TextField fx:id="fundsTextfield" prefHeight="25.0" prefWidth="98.0" />
          </children>
       </HBox>
-      <Button mnemonicParsing="false" prefHeight="0.0" prefWidth="59.0" text="Next">
+      <Button mnemonicParsing="false" onAction="#mainMenu" prefHeight="0.0" prefWidth="59.0" text="Next">
          <VBox.margin>
             <Insets left="20.0" />
          </VBox.margin>
