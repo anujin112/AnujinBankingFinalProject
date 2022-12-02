@@ -17,13 +17,8 @@ public class BankingController {
     @FXML
     private TextField fundsTextfield;
     
-    @FXML
-    private TextField toAdd;
-    
-    @FXML
-    private Label availFunds;
-    
-    @FXML
+    private TextField toAdd = new TextField();
+    private Label availFunds = new Label();
     private double funds;
     
     @FXML
@@ -45,7 +40,7 @@ public class BankingController {
     	subtractFundsButton.setOnAction(e -> applicationStage.setScene(subtractFundsScene));
     	Button expensesButton = new Button("Calculate monthly expenses");
     	Button exitButton = new Button("Exit");
-    	mainMenuContainer.getChildren().addAll(mainMenuTitle, addFundsButton, subtractFundsButton, expensesButton, exitButton);
+    	mainMenuContainer.getChildren().addAll(mainMenuTitle, availFunds, addFundsButton, subtractFundsButton, expensesButton, exitButton);
     	applicationStage.setScene(mainMenuScene);
     	
     	// add funds widgets
@@ -53,7 +48,7 @@ public class BankingController {
     	TextField toAdd = new TextField();
     	Button addButton = new Button("Add");
     	addButton.setOnAction(addEvent -> addFunds(mainMenuScene, toAdd));
-    	addFundsContainer.getChildren().addAll(addFundsTitle, toAdd, addButton);
+    	addFundsContainer.getChildren().addAll(addFundsTitle, availFunds, toAdd, addButton);
     	
     	// subtract funds widgets
     	Label subtractFundsTitle = new Label("Subtract Funds");
@@ -73,10 +68,9 @@ public class BankingController {
 
     void addFunds(Scene mainMenuScene, TextField toAdd) {
     	applicationStage.setScene(mainMenuScene);
-    	double startingFunds = Double.parseDouble(fundsTextfield.getText());
     	double toAddDouble = Double.parseDouble(toAdd.getText());
     	
-    	funds = startingFunds + toAddDouble;
+    	funds = funds + toAddDouble;
     }
     
 }
