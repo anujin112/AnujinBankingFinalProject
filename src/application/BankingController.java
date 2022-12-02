@@ -1,25 +1,22 @@
 package application;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class BankingController {
 	Stage applicationStage;
 	
-    @FXML
-    private TextField fundsTextfield;
-    
-    private TextField toAdd = new TextField();
     private Label availFunds = new Label();
     private double funds;
+	
+    @FXML
+    private TextField fundsTextfield;
     
     @FXML
     void mainMenu(ActionEvent event) { // first "Next" button
@@ -40,15 +37,19 @@ public class BankingController {
     	subtractFundsButton.setOnAction(e -> applicationStage.setScene(subtractFundsScene));
     	Button expensesButton = new Button("Calculate monthly expenses");
     	Button exitButton = new Button("Exit");
+    	exitButton.setOnAction(exitApp -> System.exit(0));
     	mainMenuContainer.getChildren().addAll(mainMenuTitle, availFunds, addFundsButton, subtractFundsButton, expensesButton, exitButton);
     	applicationStage.setScene(mainMenuScene);
     	
     	// add funds widgets
     	Label addFundsTitle = new Label("Add Funds");
+    	Label availFundsAdd = new Label("Available funds: $" + funds);
     	TextField toAdd = new TextField();
     	Button addButton = new Button("Add");
     	addButton.setOnAction(addEvent -> addFunds(mainMenuScene, toAdd));
-    	addFundsContainer.getChildren().addAll(addFundsTitle, availFunds, toAdd, addButton);
+    	Button cancelAdd = new Button("Cancel");
+    	cancelAdd.setOnAction(cancelEvent -> cancelAction(mainMenuScene));
+    	addFundsContainer.getChildren().addAll(addFundsTitle, availFundsAdd, toAdd, addButton, cancelAdd);
     	
     	// subtract funds widgets
     	Label subtractFundsTitle = new Label("Subtract Funds");
@@ -66,11 +67,17 @@ public class BankingController {
     	}*/
     }
 
-    void addFunds(Scene mainMenuScene, TextField toAdd) {
+	void addFunds(Scene mainMenuScene, TextField toAdd) {
     	applicationStage.setScene(mainMenuScene);
     	double toAddDouble = Double.parseDouble(toAdd.getText());
     	
-    	funds = funds + toAddDouble;
+    	toAdd.clear();
+    	funds = funds + toAddDouble; // why doesn't this change funds for label on its own?
+    	availFunds.setText("Available funds: $" + funds);
     }
+	
+	void cancelAction(Scene mainMenuScene) {
+		applicationStage.setScene(mainMenuScene);
+	}
     
 }
