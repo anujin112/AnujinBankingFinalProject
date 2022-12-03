@@ -16,7 +16,9 @@ public class BankingController {
 	Stage applicationStage;
     private double funds;
     private Label availFunds = new Label("Available funds: $" + funds);
+    private Label errorMessage = new Label("");
     private List<Label> availFundsLabels = new ArrayList<Label>();
+    private boolean validInputCheck;
 	
     @FXML
     private TextField fundsTextfield;
@@ -54,7 +56,7 @@ public class BankingController {
     	addButton.setOnAction(addEvent -> addFunds(mainMenuScene, toAdd)); // calls addFunds method
     	Button cancelAdd = new Button("Cancel");
     	cancelAdd.setOnAction(cancelEvent -> cancelAction(mainMenuScene, toAdd));
-    	addFundsContainer.getChildren().addAll(addFundsTitle, availFundsAdd, toAdd, addButton, cancelAdd);
+    	addFundsContainer.getChildren().addAll(addFundsTitle, availFundsAdd, errorMessage, toAdd, addButton, cancelAdd);
     	
     	// subtract funds widgets
     	Label subtractFundsTitle = new Label("Subtract Funds");
@@ -69,13 +71,18 @@ public class BankingController {
     }
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
-		applicationStage.setScene(mainMenuScene);
 		double toAddDouble = Double.parseDouble(toAdd.getText());
+		toAdd.clear();
 		
-    	toAdd.clear();
-    	funds = funds + toAddDouble;
-    	labelsRefresher(funds);
-    	//availFunds.setText("Available funds: $" + funds);
+		try {
+			inputChecker(toAddDouble, toAdd);
+			applicationStage.setScene(mainMenuScene);
+			funds = funds + toAddDouble;
+			labelsRefresher(funds);
+		} catch (InvalidInputException iie ) {
+			validInputCheck = false;
+			errorMessage.setText(iie.getMessage());
+		}
     }
 	
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
@@ -93,19 +100,34 @@ public class BankingController {
 		}
 	}
 	
-	/*public boolean inputChecker(double input) {
-    	if (input > 0) {
-    		validInputCheck = true;
-    	} else if (input == 0) {
-    		validInputCheck = false;
-    		errorMessage.setText("Please enter an amount.");
-    	} else {
-    		validInputCheck = false;
-    		errorMessage.setText("Invalid input");
-    	}
-    	
-    	return validInputCheck;
-	}*/
+	void inputChecker(double input, TextField inputTextField) throws InvalidInputException {
+		errorMessage.setText("");
+		String inputAsString = inputTextField.getText();
+		int decimalCount = 0;
+		
+		for (char c : inputAsString.toCharArray()) {
+			if (!Character.isDigit(c)) {
+				if (c == '.') {
+					decimalCount++;
+					
+					if (decimalCount > 1) {
+						throw new InvalidInputException("Do not use multiple decimal points");
+					}
+				}
+			}
+		}
+		
+		if (input > 0) {
+	    	validInputCheck = true;
+	    } else if (input == 0) {
+	    	validInputCheck = false;
+	    	throw new InvalidInputException("Please enter an amount.");
+	   	} else {
+	    	validInputCheck = false;
+	    	throw new InvalidInputException("Invalid input");
+	   	}
+		
+	}
 	
 	void cancelAction(Scene mainMenuScene, TextField inputTextField) {
 		applicationStage.setScene(mainMenuScene);
