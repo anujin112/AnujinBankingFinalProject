@@ -1,5 +1,8 @@
 package application;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -12,7 +15,8 @@ import javafx.stage.Stage;
 public class BankingController {
 	Stage applicationStage;
     private double funds;
-    private Label availFunds = new Label();
+    private Label availFunds = new Label("Available funds: $" + funds);
+    private List<Label> availFundsLabels = new ArrayList<Label>();
 	
     @FXML
     private TextField fundsTextfield;
@@ -26,6 +30,7 @@ public class BankingController {
     	Scene addFundsScene = new Scene(addFundsContainer);
     	Scene subtractFundsScene = new Scene(subtractFundsContainer);
     	funds = Double.parseDouble(fundsTextfield.getText());
+    	availFundsLabels.add(availFunds);
     	
     	// main menu widgets
     	Label mainMenuTitle = new Label("Main Menu");
@@ -43,6 +48,7 @@ public class BankingController {
     	// add funds widgets
     	Label addFundsTitle = new Label("Add Funds");
     	Label availFundsAdd = new Label("Available funds: $" + funds);
+    	availFundsLabels.add(availFundsAdd);
     	TextField toAdd = new TextField();
     	Button addButton = new Button("Add");
     	addButton.setOnAction(addEvent -> addFunds(mainMenuScene, toAdd)); // calls addFunds method
@@ -53,6 +59,7 @@ public class BankingController {
     	// subtract funds widgets
     	Label subtractFundsTitle = new Label("Subtract Funds");
     	Label availFundsSub = new Label("Available funds: $" + funds);
+    	availFundsLabels.add(availFundsSub);
     	TextField toSubtract = new TextField();
     	Button subButton = new Button("Subtract");
     	subButton.setOnAction(subEvent -> subtractFunds(mainMenuScene, toSubtract));
@@ -63,13 +70,12 @@ public class BankingController {
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
 		applicationStage.setScene(mainMenuScene);
-		BankingLibrary inputValue = new BankingLibrary();
-		double addInput = inputValue.setInputValue(toAdd);
-    	//double toAddDouble = Double.parseDouble(toAdd.getText());
+		double toAddDouble = Double.parseDouble(toAdd.getText());
+		
     	toAdd.clear();
-    	
-    	funds = funds + addInput; // why doesn't this change funds for label on its own?
-    	availFunds.setText("Available funds: $" + funds); // (without this)
+    	funds = funds + toAddDouble;
+    	labelsRefresher(funds);
+    	//availFunds.setText("Available funds: $" + funds);
     }
 	
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
@@ -79,6 +85,12 @@ public class BankingController {
 		toSubtract.clear();
 		funds = funds - toSubDouble;
 		availFunds.setText("Available funds: $" + funds);
+	}
+	
+	void labelsRefresher(double funds) {
+		for (int index = 0; index < availFundsLabels.size(); index++) {
+			availFundsLabels.get(index).setText("Available funds: $" + Double.toString(funds));
+		}
 	}
 	
 	/*public boolean inputChecker(double input) {
