@@ -2,7 +2,6 @@ package application;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -15,6 +14,7 @@ import javafx.stage.Stage;
 public class BankingController {
 	Stage applicationStage;
     private double funds;
+    private TextField userInput;
     private Label availFunds = new Label("Available funds: $" + funds);
     private List<Label> availFundsLabels = new ArrayList<Label>();
 	
@@ -28,6 +28,7 @@ public class BankingController {
     	VBox subtractFundsContainer = new VBox();
     	Scene mainMenuScene = new Scene(mainMenuContainer);
     	Scene addFundsScene = new Scene(addFundsContainer);
+    	sceneSetter(addFundsScene, mainMenuScene, addFundsContainer);
     	Scene subtractFundsScene = new Scene(subtractFundsContainer);
     	funds = Double.parseDouble(fundsTextfield.getText());
     	availFundsLabels.add(availFunds);
@@ -36,7 +37,7 @@ public class BankingController {
     	Label mainMenuTitle = new Label("Main Menu");
     	availFunds.setText("Available funds: $" + funds);
     	Button addFundsButton = new Button("Add to funds");
-    	addFundsButton.setOnAction(e -> applicationStage.setScene(addFundsScene));
+    	addFundsButton.setOnAction(addEvent -> addFunds(mainMenuScene, userInput));
     	Button subtractFundsButton = new Button("Subtract from funds");
     	subtractFundsButton.setOnAction(e -> applicationStage.setScene(subtractFundsScene));
     	Button expensesButton = new Button("Calculate monthly expenses");
@@ -44,17 +45,6 @@ public class BankingController {
     	exitButton.setOnAction(exitApp -> System.exit(0));
     	mainMenuContainer.getChildren().addAll(mainMenuTitle, availFunds, addFundsButton, subtractFundsButton, expensesButton, exitButton);
     	applicationStage.setScene(mainMenuScene);
-    	
-    	// add funds widgets
-    	Label addFundsTitle = new Label("Add Funds");
-    	Label availFundsAdd = new Label("Available funds: $" + funds);
-    	availFundsLabels.add(availFundsAdd);
-    	TextField toAdd = new TextField();
-    	Button addButton = new Button("Add");
-    	addButton.setOnAction(addEvent -> addFunds(mainMenuScene, toAdd)); // calls addFunds method
-    	Button cancelAdd = new Button("Cancel");
-    	cancelAdd.setOnAction(cancelEvent -> cancelAction(mainMenuScene, toAdd));
-    	addFundsContainer.getChildren().addAll(addFundsTitle, availFundsAdd, toAdd, addButton, cancelAdd);
     	
     	// subtract funds widgets
     	Label subtractFundsTitle = new Label("Subtract Funds");
@@ -68,6 +58,19 @@ public class BankingController {
     	subtractFundsContainer.getChildren().addAll(subtractFundsTitle, availFundsSub, toSubtract, subButton, cancelSub);
     }
 
+    void sceneSetter(Scene scene, Scene mainMenuScene, VBox container) {
+    	
+    	// add funds widgets
+    	Label addFundsTitle = new Label("Add Funds");
+    	Label availFundsAdd = new Label("Available funds: $" + funds);
+    	availFundsLabels.add(availFundsAdd);
+    	Button addButton = new Button("Add");
+    	Button cancelAdd = new Button("Cancel");
+    	cancelAdd.setOnAction(cancelEvent -> cancelAction(mainMenuScene, userInput));
+    	container.getChildren().addAll(addFundsTitle, availFundsAdd, userInput, addButton, cancelAdd);
+    	applicationStage.setScene(scene);
+    }
+    
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
 		applicationStage.setScene(mainMenuScene);
 		double toAddDouble = Double.parseDouble(toAdd.getText());
@@ -75,7 +78,6 @@ public class BankingController {
     	toAdd.clear();
     	funds = funds + toAddDouble;
     	labelsRefresher(funds);
-    	//availFunds.setText("Available funds: $" + funds);
     }
 	
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
@@ -84,7 +86,7 @@ public class BankingController {
 		
 		toSubtract.clear();
 		funds = funds - toSubDouble;
-		availFunds.setText("Available funds: $" + funds);
+		labelsRefresher(funds);
 	}
 	
 	void labelsRefresher(double funds) {
