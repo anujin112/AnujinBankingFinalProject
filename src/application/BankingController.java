@@ -17,18 +17,22 @@ public class BankingController {
     private double funds;
     private Label availFunds = new Label("Available funds: $" + funds);
     private List<Label> availFundsLabels = new ArrayList<Label>();
+    private Label totalExpenses = new Label("");
+    private Label expensesResult = new Label("");
 	
     @FXML
     private TextField fundsTextfield;
     
     @FXML
-    void mainMenu(ActionEvent event) { // first "Next" button
+    void mainMenuSetAll(ActionEvent event) { // first "Next" button
     	VBox mainMenuContainer = new VBox();
     	VBox addFundsContainer = new VBox();
     	VBox subtractFundsContainer = new VBox();
+    	VBox calcExpensesContainer = new VBox();
     	Scene mainMenuScene = new Scene(mainMenuContainer);
     	Scene addFundsScene = new Scene(addFundsContainer);
     	Scene subtractFundsScene = new Scene(subtractFundsContainer);
+    	Scene calcExpensesScene = new Scene(calcExpensesContainer);
     	funds = Double.parseDouble(fundsTextfield.getText());
     	availFundsLabels.add(availFunds);
     	
@@ -40,6 +44,7 @@ public class BankingController {
     	Button subtractFundsButton = new Button("Subtract from funds");
     	subtractFundsButton.setOnAction(e -> applicationStage.setScene(subtractFundsScene));
     	Button expensesButton = new Button("Calculate monthly expenses");
+    	expensesButton.setOnAction(e -> applicationStage.setScene(calcExpensesScene));
     	Button exitButton = new Button("Exit");
     	exitButton.setOnAction(exitApp -> System.exit(0));
     	mainMenuContainer.getChildren().addAll(mainMenuTitle, availFunds, addFundsButton, subtractFundsButton, expensesButton, exitButton);
@@ -66,6 +71,21 @@ public class BankingController {
     	Button cancelSub = new Button("Cancel");
     	cancelSub.setOnAction(cancelEvent -> cancelAction(mainMenuScene, toSubtract));
     	subtractFundsContainer.getChildren().addAll(subtractFundsTitle, availFundsSub, toSubtract, subButton, cancelSub);
+    
+    	// calculate expenses widgets
+    	Label calcExpensesTitle = new Label("Calculate Monthly Expenses");
+    	Label promptBudget = new Label("What was your budget for the month?");
+    	TextField budgetTextField = new TextField();
+    	Label promptBills = new Label("How much did you spend on bills?");
+    	TextField billsTextField = new TextField();
+    	Label promptGroceries = new Label("How much did you spend on groceries?");
+    	TextField groceriesTextField = new TextField();
+    	Label promptSubscribs = new Label("How much did you spned on subscriptions?");
+    	TextField subscribsTextField = new TextField();
+    	Button calcExpensesButton = new Button("Calculate");
+    	calcExpensesButton.setOnAction(calcExpensesevent -> calculateExpenses(mainMenuScene));
+    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, totalExpenses, expensesResult);
+    	
     }
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
@@ -84,7 +104,12 @@ public class BankingController {
 		
 		toSubtract.clear();
 		funds = funds - toSubDouble;
-		availFunds.setText("Available funds: $" + funds);
+		labelsRefresher(funds);
+		//availFunds.setText("Available funds: $" + funds);
+	}
+	
+	void calculateExpenses(Scene mainMenuScene) {
+		applicationStage.setScene(mainMenuScene);
 	}
 	
 	void labelsRefresher(double funds) {
