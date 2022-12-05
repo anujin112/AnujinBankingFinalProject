@@ -134,6 +134,7 @@ public class BankingController {
 		totalExpensesLabel.setText("Your total expenses: $" + totalExpenses);
 	}
 	
+	// put these in a separate class
 	public double convertToDouble(TextField textFieldInput) {
 		double inputAsDouble = Double.parseDouble(textFieldInput.getText());
 		return inputAsDouble;
@@ -145,23 +146,23 @@ public class BankingController {
 		}
 	}
 	
-	/*public boolean inputChecker(double input) {
-    	if (input > 0) {
-    		validInputCheck = true;
-    	} else if (input == 0) {
-    		validInputCheck = false;
-    		errorMessage.setText("Please enter an amount.");
-    	} else {
-    		validInputCheck = false;
-    		errorMessage.setText("Invalid input");
-    	}
-    	
-    	return validInputCheck;
-	}*/
-	
 	void cancelAction(Scene mainMenuScene, TextField inputTextField) {
 		applicationStage.setScene(mainMenuScene);
 		inputTextField.clear();
 	}
     
+	/*public boolean inputChecker(double input) {
+		if (input > 0) {
+			validInputCheck = true;
+		} else if (input == 0) {
+			validInputCheck = false;
+			errorMessage.setText("Please enter an amount.");
+		} else {
+			validInputCheck = false;
+			errorMessage.setText("Invalid input");
+		}
+		
+		return validInputCheck;
+	}*/
+	
 }
