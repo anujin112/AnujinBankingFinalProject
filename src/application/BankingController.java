@@ -1,6 +1,7 @@
 package application;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.event.ActionEvent;
@@ -17,8 +18,8 @@ public class BankingController {
     private double funds;
     private Label availFunds = new Label("Available funds: $" + funds);
     private List<Label> availFundsLabels = new ArrayList<Label>();
-    private Label totalExpenses = new Label("");
-    private Label expensesResult = new Label("");
+    private Label totalExpensesLabel = new Label("");
+    private Label expensesResultLabel = new Label("");
 	
     @FXML
     private TextField fundsTextfield;
@@ -80,17 +81,19 @@ public class BankingController {
     	TextField billsTextField = new TextField();
     	Label promptGroceries = new Label("How much did you spend on groceries?");
     	TextField groceriesTextField = new TextField();
-    	Label promptSubscribs = new Label("How much did you spned on subscriptions?");
+    	Label promptSubscribs = new Label("How much did you spend on subscriptions?");
     	TextField subscribsTextField = new TextField();
     	Button calcExpensesButton = new Button("Calculate");
-    	calcExpensesButton.setOnAction(calcExpensesevent -> calculateExpenses(mainMenuScene));
-    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, totalExpenses, expensesResult);
+    	Button backButton = new Button("Back");
+    	backButton.setOnAction(backEvent -> applicationStage.setScene(mainMenuScene));
+    	calcExpensesButton.setOnAction(calcExpensesevent -> calculateExpenses(mainMenuScene, budgetTextField, billsTextField, groceriesTextField, subscribsTextField));
+    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, totalExpensesLabel, expensesResultLabel);
     	
     }
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
 		applicationStage.setScene(mainMenuScene);
-		double toAddDouble = Double.parseDouble(toAdd.getText());
+		double toAddDouble = convertToDouble(toAdd);
 		
     	toAdd.clear();
     	funds = funds + toAddDouble;
@@ -100,7 +103,7 @@ public class BankingController {
 	
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
 		applicationStage.setScene(mainMenuScene);
-		double toSubDouble = Double.parseDouble(toSubtract.getText());
+		double toSubDouble = convertToDouble(toSubtract);
 		
 		toSubtract.clear();
 		funds = funds - toSubDouble;
@@ -108,8 +111,32 @@ public class BankingController {
 		//availFunds.setText("Available funds: $" + funds);
 	}
 	
-	void calculateExpenses(Scene mainMenuScene) {
-		applicationStage.setScene(mainMenuScene);
+	void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) {
+		ArrayList<TextField> allTextFields = new ArrayList<TextField>();
+		Collections.addAll(allTextFields, budgetTextField, billsTextField, groceriesTextField, subscribsTextField);
+		double budget = convertToDouble(budgetTextField);
+		double bills = convertToDouble(billsTextField);
+		double groceries = convertToDouble(groceriesTextField);
+		double subscriptions = convertToDouble(subscribsTextField);
+		double totalExpenses = bills + groceries + subscriptions;
+		
+		// clearing all text fields
+		for (int index = 0; index < allTextFields.size(); index++) {
+			allTextFields.get(index).clear();
+		}
+		
+		if (totalExpenses <= budget) {
+			expensesResultLabel.setText("You stayed on budget!");
+		} else {
+			expensesResultLabel.setText("You went over budget!");
+		}
+		
+		totalExpensesLabel.setText("Your total expenses: $" + totalExpenses);
+	}
+	
+	public double convertToDouble(TextField textFieldInput) {
+		double inputAsDouble = Double.parseDouble(textFieldInput.getText());
+		return inputAsDouble;
 	}
 	
 	void labelsRefresher(double funds) {
