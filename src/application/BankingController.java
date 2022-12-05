@@ -93,7 +93,8 @@ public class BankingController {
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
 		applicationStage.setScene(mainMenuScene);
-		double toAddDouble = convertToDouble(toAdd);
+		Banking adding = new Banking();
+		double toAddDouble = adding.convertToDouble(toAdd);
 		
     	toAdd.clear();
     	funds = funds + toAddDouble;
@@ -103,7 +104,8 @@ public class BankingController {
 	
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
 		applicationStage.setScene(mainMenuScene);
-		double toSubDouble = convertToDouble(toSubtract);
+		Banking subtracting = new Banking();
+		double toSubDouble = subtracting.convertToDouble(toSubtract);
 		
 		toSubtract.clear();
 		funds = funds - toSubDouble;
@@ -113,16 +115,25 @@ public class BankingController {
 	
 	void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) {
 		ArrayList<TextField> allTextFields = new ArrayList<TextField>();
-		Collections.addAll(allTextFields, budgetTextField, billsTextField, groceriesTextField, subscribsTextField);
-		double budget = convertToDouble(budgetTextField);
-		double bills = convertToDouble(billsTextField);
-		double groceries = convertToDouble(groceriesTextField);
-		double subscriptions = convertToDouble(subscribsTextField);
-		double totalExpenses = bills + groceries + subscriptions;
+		List<Double> expensesDoubles = new ArrayList<Double>();
+		Collections.addAll(allTextFields, billsTextField, groceriesTextField, subscribsTextField);
+		Banking expenses = new Banking();
+		double budget = expenses.convertToDouble(budgetTextField);
+		double totalExpenses = 0.0;
 		
 		// clearing all text fields
 		for (int index = 0; index < allTextFields.size(); index++) {
 			allTextFields.get(index).clear();
+		}
+		
+		// converting doubles
+		for (int index = 0; index < expensesDoubles.size(); index ++) {
+			Collections.addAll(expensesDoubles, (expenses.convertToDouble(allTextFields.get(index))));
+		}
+		
+		// calculating total expenses using converted doubles list
+		for (double x : expensesDoubles) {
+			totalExpenses = totalExpenses + x; // not being updated
 		}
 		
 		if (totalExpenses <= budget) {
