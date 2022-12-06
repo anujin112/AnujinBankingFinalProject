@@ -16,7 +16,7 @@ import javafx.stage.Stage;
 public class BankingController {
 	Stage applicationStage;
     private double funds;
-    private boolean validInputCheck = true;
+    //private boolean validInputCheck = true;
     private Label errorMessage = new Label("");
     private Label availFunds = new Label("Available funds: $" + funds);
     private List<Label> availFundsLabels = new ArrayList<Label>();
@@ -94,15 +94,35 @@ public class BankingController {
     }
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
-		double toAddDouble = convertToDouble(toAdd);
-		validInputCheck = inputChecker(toAddDouble, toAdd);
+		applicationStage.setScene(mainMenuScene);
+		errorMessage.setText("");
+		String toAddString = toAdd.getText();
+		boolean validInputCheck = true;
+		//validInputCheck = inputChecker(toAddDouble, toAdd);
 		
-		if (validInputCheck = true) {
-			applicationStage.setScene(mainMenuScene);
-	    	toAdd.clear();
-	    	funds = funds + toAddDouble;
-	    	labelsRefresher(funds);
-	    	//availFunds.setText("Available funds: $" + funds);
+		for (char c : toAddString.toCharArray()) {
+			if (!Character.isDigit(c)) {
+				validInputCheck = false;
+				errorMessage.setText("Invalid input");
+			}
+		}
+		
+		double toAddDouble = 0.0;
+		if (validInputCheck) {
+			toAddDouble = convertToDouble(toAdd);
+			
+			if (toAddDouble > 0) {
+		    	toAdd.clear();
+		    	funds = funds + toAddDouble;
+		    	labelsRefresher(funds);
+		    	//availFunds.setText("Available funds: $" + funds);
+	    	} else if (toAddDouble == 0) {
+	    		errorMessage.setText("Please enter an amount.");
+	    	} else {
+	    		errorMessage.setText("Invalid input");
+	    	}
+		} else {
+			errorMessage.setText("Invalid input");
 		}
     }
 	
@@ -150,7 +170,7 @@ public class BankingController {
 		}
 	}
 	
-	public boolean inputChecker(double input, TextField inputTextField) {
+	/*public boolean inputChecker(double input, TextField inputTextField) {
 		int decimalCount = 0;
 		String inputAsString = inputTextField.getText();
 		
@@ -178,7 +198,7 @@ public class BankingController {
 		}
     	
     	return validInputCheck;
-	}
+	}*/
 	
 	void cancelAction(Scene mainMenuScene, TextField inputTextField) {
 		applicationStage.setScene(mainMenuScene);
