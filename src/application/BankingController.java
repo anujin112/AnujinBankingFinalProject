@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 public class BankingController {
 	Stage applicationStage;
     private double funds;
+    private boolean validInputCheck = true;
+    private Label errorMessage = new Label("");
     private Label availFunds = new Label("Available funds: $" + funds);
     private List<Label> availFundsLabels = new ArrayList<Label>();
     private Label totalExpensesLabel = new Label("");
@@ -48,7 +50,7 @@ public class BankingController {
     	expensesButton.setOnAction(e -> applicationStage.setScene(calcExpensesScene));
     	Button exitButton = new Button("Exit");
     	exitButton.setOnAction(exitApp -> System.exit(0));
-    	mainMenuContainer.getChildren().addAll(mainMenuTitle, availFunds, addFundsButton, subtractFundsButton, expensesButton, exitButton);
+    	mainMenuContainer.getChildren().addAll(mainMenuTitle, availFunds, addFundsButton, subtractFundsButton, expensesButton, errorMessage, exitButton);
     	applicationStage.setScene(mainMenuScene);
     	
     	// add funds widgets
@@ -92,13 +94,16 @@ public class BankingController {
     }
 
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
-		applicationStage.setScene(mainMenuScene);
 		double toAddDouble = convertToDouble(toAdd);
+		validInputCheck = inputChecker(toAddDouble, toAdd);
 		
-    	toAdd.clear();
-    	funds = funds + toAddDouble;
-    	labelsRefresher(funds);
-    	//availFunds.setText("Available funds: $" + funds);
+		if (validInputCheck = true) {
+			applicationStage.setScene(mainMenuScene);
+	    	toAdd.clear();
+	    	funds = funds + toAddDouble;
+	    	labelsRefresher(funds);
+	    	//availFunds.setText("Available funds: $" + funds);
+		}
     }
 	
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
@@ -145,19 +150,35 @@ public class BankingController {
 		}
 	}
 	
-	/*public boolean inputChecker(double input) {
-    	if (input > 0) {
-    		validInputCheck = true;
-    	} else if (input == 0) {
-    		validInputCheck = false;
-    		errorMessage.setText("Please enter an amount.");
-    	} else {
-    		validInputCheck = false;
-    		errorMessage.setText("Invalid input");
-    	}
+	public boolean inputChecker(double input, TextField inputTextField) {
+		int decimalCount = 0;
+		String inputAsString = inputTextField.getText();
+		
+		for (char c : inputAsString.toCharArray()) {
+			if (!Character.isDigit(c)) {
+				if (c == '.') {
+					decimalCount++;
+					
+					if (decimalCount > 1) {
+						errorMessage.setText("Invalid input");
+					}
+				}
+				errorMessage.setText("Invalid input");
+			}
+			
+			if (input > 0) {
+	    		validInputCheck = true;
+	    	} else if (input == 0) {
+	    		validInputCheck = false;
+	    		errorMessage.setText("Please enter an amount.");
+	    	} else {
+	    		validInputCheck = false;
+	    		errorMessage.setText("Invalid input");
+	    	}
+		}
     	
     	return validInputCheck;
-	}*/
+	}
 	
 	void cancelAction(Scene mainMenuScene, TextField inputTextField) {
 		applicationStage.setScene(mainMenuScene);
