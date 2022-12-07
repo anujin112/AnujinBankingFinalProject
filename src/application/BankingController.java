@@ -38,7 +38,7 @@ public class BankingController {
      * @param event
      */
     @FXML
-    void mainMenuSetAll(ActionEvent event) { // first "Next" button
+    private void mainMenuSetAll(ActionEvent event) { // first "Next" button
     	VBox mainMenuContainer = new VBox();
     	VBox addFundsContainer = new VBox();
     	VBox subtractFundsContainer = new VBox();
@@ -117,11 +117,12 @@ public class BankingController {
      * @param mainMenuScene
      * @param toAdd
      */
-	void addFunds(Scene mainMenuScene, TextField toAdd) {
+	private void addFunds(Scene mainMenuScene, TextField toAdd) {
 		applicationStage.setScene(mainMenuScene);
 		errorMessage.setText("");
 		String toAddString = toAdd.getText();
 		
+		// error handling for input: letters and non-integer characters
 		for (char c : toAddString.toCharArray()) {
 			if (!Character.isDigit(c)) {
 				validInputCheck = false;
@@ -129,10 +130,12 @@ public class BankingController {
 			}
 		}
 		
+		// error handling for input: zero or negative integers
 		double toAddDouble = 0.0;
 		if (validInputCheck) {
 			toAddDouble = convertToDouble(toAdd);
 			
+			// core calculation of the method
 			if (toAddDouble > 0) {
 		    	toAdd.clear();
 		    	funds = funds + toAddDouble;
@@ -157,11 +160,12 @@ public class BankingController {
      * @param mainMenuScene
      * @param toSubtract
      */
-	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
+	private void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
 		applicationStage.setScene(mainMenuScene);
 		errorMessage.setText("");
 		String toSubtractString = toSubtract.getText();
 
+		// error handling for input: letters and non-integer characters
 		for (char c : toSubtractString.toCharArray()) {
 			if (!Character.isDigit(c)) {
 				validInputCheck = false;
@@ -169,13 +173,15 @@ public class BankingController {
 			}
 		}
 		
+		// error handling for input: zero or negative integers
 		double toSubtractDouble = 0.0;
 		if (validInputCheck) {
 			toSubtractDouble = convertToDouble(toSubtract);
 			
+			// core calculation of the method
 			if (toSubtractDouble > 0) {
 		    	toSubtract.clear();
-		    	funds = funds + toSubtractDouble;
+		    	funds = funds - toSubtractDouble;
 		    	labelsRefresher(funds);
 	    	} else if (toSubtractDouble == 0) {
 	    		errorMessage.setText("Please enter an amount.");
@@ -200,7 +206,7 @@ public class BankingController {
 	 * @param subscribsTextField
 	 * @throws InvalidInputException 
 	 */
-	void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) throws InvalidInputException {
+	private void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) throws InvalidInputException {
 		ArrayList<TextField> allTextFields = new ArrayList<TextField>();
 		expensesResultLabel.setText("");
 		validInputCheck = true;
@@ -211,10 +217,12 @@ public class BankingController {
 		double subscriptions = convertToDouble(subscribsTextField);
 		double totalExpenses = bills + groceries + subscriptions;
 		
+		// clearing all text fields
 		for (int index = 0; index < allTextFields.size(); index++) {
 			allTextFields.get(index).clear();
 		}
 		
+		// error handling for input: negatives
 		if (validInputCheck == true) {
 			if (budget < 0 || bills < 0 || groceries < 0 || subscriptions < 0) {
 				validInputCheck = false;
@@ -233,11 +241,6 @@ public class BankingController {
 				
 				totalExpensesLabel.setText("Your total expenses: $" + totalExpenses);
 			}
-			
-			// clearing all text fields
-			for (int index = 0; index < allTextFields.size(); index++) {
-				allTextFields.get(index).clear();
-			}
 		}
 	}
 	
@@ -248,9 +251,10 @@ public class BankingController {
 	 * @return
 	 * @throws InvalidInputException 
 	 */
-	public double convertToDouble(TextField textFieldInput) {
+	private double convertToDouble(TextField textFieldInput) {
 		double inputAsDouble = 0.0;
 		
+		// error handling for no input
 		try {
 			if (!textFieldInput.getText().isBlank()) {
 				inputAsDouble = Double.parseDouble(textFieldInput.getText());
@@ -271,7 +275,7 @@ public class BankingController {
 	 * and up to date.
 	 * @param funds
 	 */
-	void labelsRefresher(double funds) {
+	private void labelsRefresher(double funds) {
 		for (int index = 0; index < availFundsLabels.size(); index++) {
 			availFundsLabels.get(index).setText("Available funds: $" + Double.toString(funds));
 		}
@@ -284,20 +288,20 @@ public class BankingController {
 	 * preparation for any new calculations.
 	 * @param mainMenuScene
 	 */
-	void backAction(Scene mainMenuScene) {
+	private void backAction(Scene mainMenuScene) {
 		applicationStage.setScene(mainMenuScene);
 		totalExpensesLabel.setText("");
 		expensesResultLabel.setText("");
 	}
 	
 	/**
-	 * Clears any inputs that may have bee entered
+	 * Clears any inputs that may have been entered
 	 * by the user before taking the user back to
 	 * the main menu.
 	 * @param mainMenuScene
 	 * @param inputTextField
 	 */
-	void cancelAction(Scene mainMenuScene, TextField inputTextField) {
+	private void cancelAction(Scene mainMenuScene, TextField inputTextField) {
 		applicationStage.setScene(mainMenuScene);
 		inputTextField.clear();
 	}
