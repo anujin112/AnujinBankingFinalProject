@@ -98,7 +98,7 @@ public class BankingController {
     	TextField subscribsTextField = new TextField();
     	Button calcExpensesButton = new Button("Calculate");
     	Button backButton = new Button("Back");
-    	backButton.setOnAction(backEvent -> applicationStage.setScene(mainMenuScene));
+    	backButton.setOnAction(e -> backAction(mainMenuScene));
     	calcExpensesButton.setOnAction(calcExpensesevent -> {
 			try {
 				calculateExpenses(mainMenuScene, budgetTextField, billsTextField, groceriesTextField, subscribsTextField);
@@ -106,7 +106,7 @@ public class BankingController {
 				errorMessage.setText(e.getMessage());
 			}
 		});
-    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, totalExpensesLabel, expensesResultLabel);	
+    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, backButton, totalExpensesLabel, expensesResultLabel);	
     }
     
     /**
@@ -202,6 +202,8 @@ public class BankingController {
 	 */
 	void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) throws InvalidInputException {
 		ArrayList<TextField> allTextFields = new ArrayList<TextField>();
+		expensesResultLabel.setText("");
+		validInputCheck = true;
 		Collections.addAll(allTextFields, budgetTextField, billsTextField, groceriesTextField, subscribsTextField);
 		double budget = convertToDouble(budgetTextField);
 		double bills = convertToDouble(billsTextField);
@@ -209,12 +211,18 @@ public class BankingController {
 		double subscriptions = convertToDouble(subscribsTextField);
 		double totalExpenses = bills + groceries + subscriptions;
 		
+		for (int index = 0; index < allTextFields.size(); index++) {
+			allTextFields.get(index).clear();
+		}
+		
 		if (validInputCheck == true) {
 			if (budget < 0 || bills < 0 || groceries < 0 || subscriptions < 0) {
 				validInputCheck = false;
 				errorMessage.setText("Invalid input");
 				applicationStage.setScene(mainMenuScene);
 			}
+			
+			expensesResultLabel.setText("");
 			
 			if (validInputCheck) {
 				if (totalExpenses <= budget) {
@@ -251,7 +259,7 @@ public class BankingController {
 				throw new InvalidInputException();
 			}
 		} catch (InvalidInputException iie) {
-			expensesResultLabel.setText("Enter 0 if there were no expenses");
+			expensesResultLabel.setText("Enter 0 if there were no expenses. Please reload.");
 		}
 		
 		return inputAsDouble;
@@ -267,6 +275,19 @@ public class BankingController {
 		for (int index = 0; index < availFundsLabels.size(); index++) {
 			availFundsLabels.get(index).setText("Available funds: $" + Double.toString(funds));
 		}
+	}
+	
+	/**
+	 * Takes the user back to the main menu once
+	 * they are finished interacting with the calculate monthly
+	 * expenses window, and discards the last results in 
+	 * preparation for any new calculations.
+	 * @param mainMenuScene
+	 */
+	void backAction(Scene mainMenuScene) {
+		applicationStage.setScene(mainMenuScene);
+		totalExpensesLabel.setText("");
+		expensesResultLabel.setText("");
 	}
 	
 	/**
