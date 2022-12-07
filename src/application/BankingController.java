@@ -1,6 +1,7 @@
 package application;
 
 import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -13,19 +14,29 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * 
+ * @author Anujin
+ *
+ */
 public class BankingController {
 	Stage applicationStage;
     private double funds;
-    //private boolean validInputCheck = true;
     private Label errorMessage = new Label("");
     private Label availFunds = new Label("Available funds: $" + funds);
     private List<Label> availFundsLabels = new ArrayList<Label>();
     private Label totalExpensesLabel = new Label("");
     private Label expensesResultLabel = new Label("");
+    private boolean validInputCheck = true;
 	
     @FXML
     private TextField fundsTextfield;
     
+    /**
+     * Sets up the main menu and all relevant widgets in advance 
+     * of any user input or calculations.
+     * @param event
+     */
     @FXML
     void mainMenuSetAll(ActionEvent event) { // first "Next" button
     	VBox mainMenuContainer = new VBox();
@@ -88,17 +99,28 @@ public class BankingController {
     	Button calcExpensesButton = new Button("Calculate");
     	Button backButton = new Button("Back");
     	backButton.setOnAction(backEvent -> applicationStage.setScene(mainMenuScene));
-    	calcExpensesButton.setOnAction(calcExpensesevent -> calculateExpenses(mainMenuScene, budgetTextField, billsTextField, groceriesTextField, subscribsTextField));
-    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, totalExpensesLabel, expensesResultLabel);
-    	
+    	calcExpensesButton.setOnAction(calcExpensesevent -> {
+			try {
+				calculateExpenses(mainMenuScene, budgetTextField, billsTextField, groceriesTextField, subscribsTextField);
+			} catch (InvalidInputException e) {
+				errorMessage.setText(e.getMessage());
+			}
+		});
+    	calcExpensesContainer.getChildren().addAll(calcExpensesTitle, promptBudget, budgetTextField, promptBills, billsTextField, promptGroceries, groceriesTextField, promptSubscribs, subscribsTextField, calcExpensesButton, totalExpensesLabel, expensesResultLabel);	
     }
-
+    
+    /**
+     * Adds the double value entered by the user to the total
+     * available funds that was initially given. Updates
+     * the available funds, then takes the user back to
+     * the main menu.
+     * @param mainMenuScene
+     * @param toAdd
+     */
 	void addFunds(Scene mainMenuScene, TextField toAdd) {
 		applicationStage.setScene(mainMenuScene);
 		errorMessage.setText("");
 		String toAddString = toAdd.getText();
-		boolean validInputCheck = true;
-		//validInputCheck = inputChecker(toAddDouble, toAdd);
 		
 		for (char c : toAddString.toCharArray()) {
 			if (!Character.isDigit(c)) {
@@ -115,7 +137,6 @@ public class BankingController {
 		    	toAdd.clear();
 		    	funds = funds + toAddDouble;
 		    	labelsRefresher(funds);
-		    	//availFunds.setText("Available funds: $" + funds);
 	    	} else if (toAddDouble == 0) {
 	    		errorMessage.setText("Please enter an amount.");
 	    	} else {
@@ -124,19 +145,62 @@ public class BankingController {
 		} else {
 			errorMessage.setText("Invalid input");
 		}
+		
+		toAdd.clear();
     }
 	
+	/**
+     * Subtracts the double value entered by the user from the total
+     * available funds that was initially given. Updates
+     * the available funds, then takes the user back to
+     * the main menu.
+     * @param mainMenuScene
+     * @param toSubtract
+     */
 	void subtractFunds(Scene mainMenuScene, TextField toSubtract) {
 		applicationStage.setScene(mainMenuScene);
-		double toSubDouble = convertToDouble(toSubtract);
+		errorMessage.setText("");
+		String toSubtractString = toSubtract.getText();
+
+		for (char c : toSubtractString.toCharArray()) {
+			if (!Character.isDigit(c)) {
+				validInputCheck = false;
+				errorMessage.setText("Invalid input");
+			}
+		}
+		
+		double toSubtractDouble = 0.0;
+		if (validInputCheck) {
+			toSubtractDouble = convertToDouble(toSubtract);
+			
+			if (toSubtractDouble > 0) {
+		    	toSubtract.clear();
+		    	funds = funds + toSubtractDouble;
+		    	labelsRefresher(funds);
+	    	} else if (toSubtractDouble == 0) {
+	    		errorMessage.setText("Please enter an amount.");
+	    	} else {
+	    		errorMessage.setText("Invalid input");
+	    	}
+		} else {
+			errorMessage.setText("Invalid input");
+		}
 		
 		toSubtract.clear();
-		funds = funds - toSubDouble;
-		labelsRefresher(funds);
-		//availFunds.setText("Available funds: $" + funds);
 	}
 	
-	void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) {
+	/**
+	 * Uses information entered by the user for their month's expenses
+	 * to determine whether the user stayed on budget or not by 
+	 * comparing the sum of the expenses to a budget given by the user.
+	 * @param mainMenuScene
+	 * @param budgetTextField
+	 * @param billsTextField
+	 * @param groceriesTextField
+	 * @param subscribsTextField
+	 * @throws InvalidInputException 
+	 */
+	void calculateExpenses(Scene mainMenuScene, TextField budgetTextField, TextField billsTextField, TextField groceriesTextField, TextField subscribsTextField) throws InvalidInputException {
 		ArrayList<TextField> allTextFields = new ArrayList<TextField>();
 		Collections.addAll(allTextFields, budgetTextField, billsTextField, groceriesTextField, subscribsTextField);
 		double budget = convertToDouble(budgetTextField);
@@ -145,64 +209,75 @@ public class BankingController {
 		double subscriptions = convertToDouble(subscribsTextField);
 		double totalExpenses = bills + groceries + subscriptions;
 		
-		// clearing all text fields
-		for (int index = 0; index < allTextFields.size(); index++) {
-			allTextFields.get(index).clear();
+		if (validInputCheck == true) {
+			if (budget < 0 || bills < 0 || groceries < 0 || subscriptions < 0) {
+				validInputCheck = false;
+				errorMessage.setText("Invalid input");
+				applicationStage.setScene(mainMenuScene);
+			}
+			
+			if (validInputCheck) {
+				if (totalExpenses <= budget) {
+					expensesResultLabel.setText("You stayed on budget!");
+				} else {
+					expensesResultLabel.setText("You went over budget!");
+				}
+				
+				totalExpensesLabel.setText("Your total expenses: $" + totalExpenses);
+			}
+			
+			// clearing all text fields
+			for (int index = 0; index < allTextFields.size(); index++) {
+				allTextFields.get(index).clear();
+			}
 		}
-		
-		if (totalExpenses <= budget) {
-			expensesResultLabel.setText("You stayed on budget!");
-		} else {
-			expensesResultLabel.setText("You went over budget!");
-		}
-		
-		totalExpensesLabel.setText("Your total expenses: $" + totalExpenses);
 	}
 	
+	/**
+	 * Converts a given TextField's text to a double
+	 * to be used for calculations. Returns the double.
+	 * @param textFieldInput
+	 * @return
+	 * @throws InvalidInputException 
+	 */
 	public double convertToDouble(TextField textFieldInput) {
-		double inputAsDouble = Double.parseDouble(textFieldInput.getText());
+		double inputAsDouble = 0.0;
+		
+		try {
+			if (!textFieldInput.getText().isBlank()) {
+				inputAsDouble = Double.parseDouble(textFieldInput.getText());
+			} else {
+				validInputCheck = false;
+				throw new InvalidInputException();
+			}
+		} catch (InvalidInputException iie) {
+			expensesResultLabel.setText("Enter 0 if there were no expenses");
+		}
+		
 		return inputAsDouble;
 	}
 	
+	/**
+	 * Refreshes the available funds label that appears
+	 * at the top of most scenes, ensuring the value stays consistent
+	 * and up to date.
+	 * @param funds
+	 */
 	void labelsRefresher(double funds) {
 		for (int index = 0; index < availFundsLabels.size(); index++) {
 			availFundsLabels.get(index).setText("Available funds: $" + Double.toString(funds));
 		}
 	}
 	
-	/*public boolean inputChecker(double input, TextField inputTextField) {
-		int decimalCount = 0;
-		String inputAsString = inputTextField.getText();
-		
-		for (char c : inputAsString.toCharArray()) {
-			if (!Character.isDigit(c)) {
-				if (c == '.') {
-					decimalCount++;
-					
-					if (decimalCount > 1) {
-						errorMessage.setText("Invalid input");
-					}
-				}
-				errorMessage.setText("Invalid input");
-			}
-			
-			if (input > 0) {
-	    		validInputCheck = true;
-	    	} else if (input == 0) {
-	    		validInputCheck = false;
-	    		errorMessage.setText("Please enter an amount.");
-	    	} else {
-	    		validInputCheck = false;
-	    		errorMessage.setText("Invalid input");
-	    	}
-		}
-    	
-    	return validInputCheck;
-	}*/
-	
+	/**
+	 * Clears any inputs that may have bee entered
+	 * by the user before taking the user back to
+	 * the main menu.
+	 * @param mainMenuScene
+	 * @param inputTextField
+	 */
 	void cancelAction(Scene mainMenuScene, TextField inputTextField) {
 		applicationStage.setScene(mainMenuScene);
 		inputTextField.clear();
 	}
-    
 }
